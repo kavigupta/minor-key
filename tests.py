@@ -14,7 +14,7 @@ class TestNoteToString(unittest.TestCase):
         self.assertEqual('C3', to_string(-12))
 
 class TestNoteLookup(unittest.TestCase):
-    def test_cmaj(self):
+    def test_fmin(self):
         rate, value = wav.read('test_wavs/fmin.wav')
         notes = {to_string(note) for note in get_notes(rate, value, 6)}
         for note in 'F4', 'Ab4', 'C5':
