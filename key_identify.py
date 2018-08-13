@@ -49,3 +49,17 @@ def by_chunk(rate, data, number_notes, chunk_size):
     chunk_size_indices = int(rate * chunk_size)
     for starting_idx in range(0, len(data), chunk_size_indices):
         yield get_notes(rate, data[starting_idx:starting_idx+chunk_size_indices], number_notes)
+
+def best_key_for_chords_incremental(chords, possible_keys):
+    """
+    Gets key with the highest score for chords[:t] for every t from 1..len(chords)
+        out of the set of possible_keys
+    """
+    cost_per_key_type = [[0] for _ in possible_keys]
+    for chord in chords:
+        for idx, key in enumerate(possible_keys):
+            cost_per_key_type[idx].append(cost_per_key_type[idx][-1] + key.score_chord(chord))
+    for time in range(len(chords)):
+        best_index = max(range(len(possible_keys)),
+                         key=lambda index, time=time: cost_per_key_type[index][time + 1])
+        yield (possible_keys[best_index], cost_per_key_type[best_index][time + 1])
