@@ -37,3 +37,15 @@ def get_notes(rate, clip, number_notes):
         if len(uniques) == number_notes:
             break
     return uniques
+
+def by_chunk(rate, data, number_notes, chunk_size):
+    """
+    Get
+        the top `number_notes` notes
+        from each sample of length `chunk_size` seconds segment
+        in the clip `data`
+        with rate `rate`
+    """
+    chunk_size_indices = int(rate * chunk_size)
+    for starting_idx in range(0, len(data), chunk_size_indices):
+        yield get_notes(rate, data[starting_idx:starting_idx+chunk_size_indices], number_notes)
