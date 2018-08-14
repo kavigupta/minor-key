@@ -45,14 +45,15 @@ class Key(namedtuple('Key', ['key_type', 'start'])):
 
 class Keys(namedtuple('Keys', ['range_to_key'])):
     """
-    Represents a set of keys, each associated with a temporal range.
+    Represents a set of keys,
+        each associated with a temporal range (start, end) a half-open interval
     """
-    def additional(self, time_range, key):
+    def additional(self, time_range, key, score):
         """
         Cosntructs a new Keys instance, but with the given time_range associated with the given key
         """
         result = dict(self.range_to_key.items())
-        result[time_range] = key
+        result[time_range] = (key, score)
         return Keys(result)
 
 major = KeyType("major", {0 : 5, 2 : 1, 4 : 3, 5 : 1, 7 : 3, 9 : 1, 11 : 1}) # pylint: disable=invalid-name
