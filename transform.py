@@ -60,6 +60,19 @@ class Transform(metaclass=ABCMeta):
         )
         return np.concatenate(by_sample)
 
+class Identity(Transform):
+    """
+    Does nothing. Overrides even non-abstract methods for efficiency purposes
+    """
+    def transform(self, note):
+        return note
+    def transform_microtone(self, note):
+        return note
+    def apply_to_sample(self, sample, rate):
+        return sample
+    def apply_to_song(self, data, rate, sample_length, processes=1):
+        return data
+
 class ToMinorTransform(Transform, metaclass=ABCMeta):
     """
     Represents a transform to a minor key
