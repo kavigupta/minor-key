@@ -53,7 +53,7 @@ def by_chunk(rate, data, number_notes, chunk_size):
 def best_key_for_chords_incremental(chords, possible_keys):
     """
     Gets key with the highest score for chords[:t] for every t from 1..len(chords)
-        out of the set of possible_keys
+        out of the set of possible_keys, along with the score
     """
     cost_per_key_type = [[0] for _ in possible_keys]
     for chord in chords:
