@@ -15,3 +15,9 @@ def convert_to_note(ffts, rate, fft_rate):
     fft_rate: the index into ffts we are converting to a note
     """
     return 12 * np.log(rate / len(ffts) * (fft_rate + 0.01) / MIDDLE_C) / np.log(2)
+
+def convert_to_index(ffts, rate, frequency):
+    """
+    The inverse of convert_to_note.
+    """
+    return int(np.round(MIDDLE_C * 2 ** (frequency / 12) * len(ffts) / rate))
