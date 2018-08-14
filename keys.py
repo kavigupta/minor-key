@@ -61,6 +61,8 @@ class Keys(namedtuple('Keys', ['range_to_key'])):
         Return the overall score
         """
         return sum(score for _, score in self.range_to_key.values())
+    def __iter__(self):
+        return iter(self.range_to_key.items())
 
 major = KeyType("major", {0 : 5, 2 : 1, 4 : 3, 5 : 1, 7 : 3, 9 : 1, 11 : 1}) # pylint: disable=invalid-name
 minor = KeyType("minor", {0 : 5, 2 : 1, 3 : 3, 5 : 1, 7 : 3, 8 : 1, 10 : 1, 11 : 1}) # pylint: disable=invalid-name
