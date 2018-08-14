@@ -73,35 +73,54 @@ class Identity(Transform):
     def apply_to_song(self, data, rate, sample_length, processes=1):
         return data
 
-class ToMinorTransform(Transform, metaclass=ABCMeta):
+class MajorMinorTransform(Transform, metaclass=ABCMeta):
     """
     Represents a transform to a minor key
     """
     def __init__(self, key_note):
         self.key_note = key_note
     def transform(self, note):
-        return note - self.is_depressed(note)
-    def is_depressed(self, note):
+        return note + self.direction() * self.is_changed(note)
+    def is_changed(self, note):
         """
         Returns whether or not the given note should be depressed
         """
-        return (note - self.key_note) % 12 in self.notes_to_be_depressed()
+        return (note - self.key_note) % 12 in self.notes_to_be_changed()
     @abstractmethod
-    def notes_to_be_depressed(self):
+    def notes_to_be_changed(self):
         """
         Return a set of notes that are to be depressed by a half tone to get the minor version.
         """
+    @abstractmethod
+    def direction(self):
+        """
+        Whether to tune down or up for this scale
+        """
 
-class MajorToHarmonicMinor(ToMinorTransform):
+class MajorToHarmonicMinor(MajorMinorTransform):
     """
     Transforms to a harmonic minor: C, D, Eb, F, G, Ab, B
     """
-    def notes_to_be_depressed(self):
+    def notes_to_be_changed(self):
         return {4, 9}
+    def direction(self):
+        return -1
 
-class MajorToNaturalMinor(ToMinorTransform):
+class MajorToNaturalMinor(MajorMinorTransform):
     """
     Transforms to a natural minor: C, D, Eb, F, G, Ab, Bb
     """
-    def notes_to_be_depressed(self):
+    def notes_to_be_changed(self):
         return {4, 9, 11}
+    def direction(self):
+        return -1
+
+class MinorToMajor(MajorMinorTransform):
+    """
+    Transforms to a major. 10 (corresponding to Bb in c minor) is raised no matter what
+        since in a harmonic minor it just wont come up much.
+    """
+    def notes_to_be_changed(self):
+        return {3, 8, 10}
+    def direction(self):
+        return 1
