@@ -3,8 +3,8 @@ import unittest
 
 from scipy.io import wavfile as wav
 
-from key_identify import get_notes, to_string, best_key_for_chords_incremental
-from keys import Key, major, minor, ALL_MAJORS_MINORS
+from key_identify import get_notes, to_string, best_key_for_chords_incremental, best_multiple_keys_for_chords
+from keys import Key, Keys, major, minor, ALL_MAJORS_MINORS
 
 class TestNoteToString(unittest.TestCase):
     def test_middle_c(self):
@@ -47,5 +47,13 @@ class TestBestKeyMatching(unittest.TestCase):
     def test_no_change(self):
         result = list(best_key_for_chords_incremental([{0}, {5}, {9}], ALL_MAJORS_MINORS))
         self.assertEqual([(Key(major, 0), 5), (Key(major, 5), 8), (Key(major, 5), 11)], result)
+
+class TestOverallKeyMatching(unittest.TestCase):
+    def test_two_keys(self):
+        result = best_multiple_keys_for_chords([{0}, {4}, {7}, {9}, {0}, {4}], 2, ALL_MAJORS_MINORS)
+        self.assertEqual(Keys({(0, 3) : (Key(major, 0), 11), (3, 6) : (Key(minor, 9), 11)}), result)
+    def test_two_overlapping_keys(self):
+        result = best_multiple_keys_for_chords([{0}, {4}, {7}, {11}, {2}], 2, ALL_MAJORS_MINORS)
+        self.assertEqual(Keys({(0, 2) : (Key(major, 0), 8), (2, 5) : (Key(major, 7), 11)}), result)
 
 unittest.main()
