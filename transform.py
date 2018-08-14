@@ -3,6 +3,8 @@ Module containing methods for transforming notes
 """
 
 from abc import ABCMeta, abstractmethod
+from functools import partial
+import multiprocessing as multi
 
 import numpy as np
 
@@ -41,19 +43,22 @@ class Transform(metaclass=ABCMeta):
             if modified_idx != 0 and 2 * modified_idx < freqs.size:
                 result[-modified_idx] += np.conj(freqs[idx])
         return np.round(np.real(np.fft.ifft(result))).astype(np.int16)
-    def apply_to_song(self, data, rate, sample_length):
+    def apply_to_song(self, data, rate, sample_length, processes=1):
         """
         Apply this transformation to a song by samples,
             where each sample is `sample_length` seconds long
         """
-        result = []
+
         sample_length_datapoints = int(rate * sample_length)
-        for start_idx in range(0, len(data), sample_length_datapoints):
-            print("*", end="")
-            sample = data[start_idx:start_idx + sample_length_datapoints]
-            modified_sample = self.apply_to_sample(sample, rate)
-            result += list(modified_sample)
-        return np.array(result)
+
+        samples = [data[start_idx:start_idx + sample_length_datapoints]
+                   for start_idx in range(0, len(data), sample_length_datapoints)]
+
+        by_sample = multi.Pool(processes=processes).map(
+            partial(self.apply_to_sample, rate=rate),
+            samples
+        )
+        return np.concatenate(by_sample)
 
 class ToMinorTransform(Transform, metaclass=ABCMeta):
     """
