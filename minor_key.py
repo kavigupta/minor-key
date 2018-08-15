@@ -3,7 +3,7 @@ import numpy as np
 
 from key_identify import best_multiple_keys_for_chords, by_chunk
 from keys import ALL_MAJORS_MINORS, major, minor
-from transform import Identity
+from transform import Identity, MinorToMajor, MajorToNaturalMinor, MajorToHarmonicMinor
 
 def minor_key(data, rate, key_transform, number_notes, number_keys, chunk_size, possible_keys=ALL_MAJORS_MINORS):
     keys = best_multiple_keys_for_chords(
@@ -24,16 +24,15 @@ def minor_key(data, rate, key_transform, number_notes, number_keys, chunk_size, 
     return np.concatenate(result)
 
 
-def major_to_minor(minor_type):
+def major_to_minor(harmonic):
+    assert isinstance(harmonic, bool)
     def _transform(key):
         if key.key_type == major:
-            return minor_type(key.start)
+            return [MajorToNaturalMinor, MajorToHarmonicMinor][harmonic](key.start)
         return Identity()
     return _transform
 
-def minor_to_major(major_type):
-    def _transform(key):
-        if key.key_type == minor:
-            return major_type(key.start)
-        return Identity()
-    return _transform
+def minor_to_major(key):
+    if key.key_type == minor:
+        return MinorToMajor(key.start)
+    return Identity()
