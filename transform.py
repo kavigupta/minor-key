@@ -37,7 +37,11 @@ class Transform(metaclass=ABCMeta):
         result = np.zeros_like(freqs)
         for idx in range(freqs.size // 2 + 1):
             note = convert_to_note(freqs, rate, idx)
-            modified_note = self.transform_microtone(note)
+            if -4 * 12 <= note <= 5 * 12:
+                # range of sounds that are in fact plausibly notes
+                modified_note = self.transform_microtone(note)
+            else:
+                modified_note = note
             modified_idx = convert_to_index(freqs, rate, modified_note)
             result[modified_idx] += freqs[idx]
             if modified_idx != 0 and 2 * modified_idx < freqs.size:
